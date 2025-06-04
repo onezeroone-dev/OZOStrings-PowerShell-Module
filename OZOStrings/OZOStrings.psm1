@@ -31,7 +31,7 @@ Function Get-OZODelimiterSubString {
         .NOTES
         Thanks to this Stack Overflow post (https://stackoverflow.com/questions/67626879/system-collections-generic-liststring-as-return-value that helped me understand how to write a function that consistently returns a List.
         .LINK
-        https://github.com/onezeroone-dev/OZO-PowerShell-Module/blob/main/README.md#get-ozodelimitersubstring
+        https://github.com/onezeroone-dev/OZO-PowerShell-Module/blob/main/Documentation/Get-OZODelimiterSubstring.md
     #>
     # Parameters
     [CmdLetBinding()]
@@ -81,7 +81,7 @@ Function Get-OZOEndSubString {
         .OUTPUTS
         System.String
         .LINK
-        https://github.com/onezeroone-dev/OZO-PowerShell-Module/blob/main/README.md#get-ozoendsubstring
+        https://github.com/onezeroone-dev/OZO-PowerShell-Module/blob/main/Documentation/Get-OZOEndSubString.md
     #>
     # Parameters
     param (
@@ -117,7 +117,7 @@ Function Get-OZOIndexSubString {
         "The quick brown fox jumps over the lazy dog." | Get-OZOIndexSubString -Index 8 -Length 4
         ck b
         .LINK
-        https://github.com/onezeroone-dev/OZO-PowerShell-Module/blob/main/README.md#get-ozoindexsubstring
+        https://github.com/onezeroone-dev/OZO-PowerShell-Module/blob/main/Documentation/Get-OZOIndexSubString.md
     #>
     # Parameters
     param (
@@ -154,6 +154,34 @@ Function Get-OZOIndexSubString {
     }
 }
 
+Function Get-OZOReverseString {
+    <#
+        .SYNOPSIS
+        See description.
+        .DESCRIPTION
+        Returns the reverse of a given string.
+        .PARAMETER String
+        The string to reverse
+        .EXAMPLE
+        Get-OZOReverseString -String "Hello, world"
+        dlrow ,olleH
+        .EXAMPLE
+        "Hello, world" | Get-OZOReverseString
+        dlrow ,olleH
+        .LINK
+        https://github.com/onezeroone-dev/OZO-PowerShell-Module/blob/main/Documentation/Get-OZOReverseString.md
+    #>
+    Param(
+        [Parameter(Mandatory=$true,HelpMessage="The string to reverse",ValueFromPipeline=$true)][String]$String
+    )
+    # Convert the string to a character array
+    [Array]$Gnirts = $String.ToCharArray()
+    # Reverse the character array
+    [Array]::Reverse($Gnirts)
+    # return the joined elements of the character array
+    return -Join $Gnirts
+}
+
 Function Get-OZOStartSubString {
     <#
         .SYNOPSIS
@@ -171,7 +199,7 @@ Function Get-OZOStartSubString {
         "The quick brown fox jumps over the lazy dog." | Get-OZOStartSubString -Length 8
         The quic
         .LINK
-        https://github.com/onezeroone-dev/OZO-PowerShell-Module/blob/main/README.md#get-ozostartsubstring
+        https://github.com/onezeroone-dev/OZO-PowerShell-Module/blob/main/Documentation/Get-OZOStartSubString.md
     #>
     # Parameters
     param (
@@ -188,4 +216,4 @@ Function Get-OZOStartSubString {
     }
 }
 
-Export-ModuleMember -Function Get-OZODelimiterSubString,Get-OZOEndSubString,Get-OZOIndexSubString,Get-OZOStartSubString
+Export-ModuleMember -Function Get-OZODelimiterSubString,Get-OZOEndSubString,Get-OZOIndexSubString,Get-OZOReverseString,Get-OZOStartSubString
