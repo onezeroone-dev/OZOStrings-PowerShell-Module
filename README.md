@@ -15,9 +15,17 @@ Import-Module OZOStrings
 ```
 
 ## Functions
-
 - [Get-OZODelimiterSubString](Documentation/Get-OZODelimiterSubstring.md)
 - [Get-OZOEndSubString](Documentation/Get-OZOEndSubString.md)
 - [Get-OZOIndexSubString](Documentation/Get-OZOIndexSubString.md)
 - [Get-OZOReverseString](Documentation/Get-OZOReverseString.md)
 - [Get-OZOStartSubString](Documentation/Get-OZOStartSubString.md)
+
+## Logging
+Messages as written to the Windows Event Viewer [_One Zero One_](https://github.com/onezeroone-dev/OZOLogger-PowerShell-Module/blob/main/README.md) provider when available. Otherwise, messages are written to the _Microsoft-Windows-PowerShell_ provider under event ID 4100.
+
+## License
+This module is licensed under the [GNU General Public License (GPL) version 2.0](LICENSE).
+
+## Acknowledgements
+Special thanks to my employer, [Sonic Healthcare USA](https://sonichealthcareusa.com), who supports the growth of my PowerShell skillset and enables me to contribute portions of my work product to the PowerShell community.

@@ -3,19 +3,16 @@ Function Get-OZODelimiterSubString {
         .SYNOPSIS
         See description.
         .DESCRIPTION
-        Parses a String and returns a List of substrings found between Start and End delimiters. If the start delimiter is not found, the List contains a single string leading up to the end delimiter. If the end delimiter is not found, the List contains a single string trailing the start delimiter. If neither delimiter is found, the List contains a single string (the original string).
+        Returns a list of strings found between Start and End delimiters. The delimiters may be characters or strings, and may be identical or different. If only the Start or End delimiter is found in the input string, the resulting list will contain a single substring (see parameters below for more detail). If neither delimiter is found in the input string, the returned list will contain the original unaltered string.
         .PARAMETER String
-        The string to process.
+        The string to process. Accepts pipeline input.
         .PARAMETER Start
-        The start delimiter.
+        The start delimiter string. When "Start" is provided and "End" is not provided, the string following "Start" is returned; and if the input string does not contain "Start", the original string is returned. When "Start" is used with "End" and the input string does not contain "Start", the string leading up to "End" is returned.
         .PARAMETER End
-        The end delimiter.
+        The end delimiter string. When "End" is provided and "Start" is not provided, the string leading up to "End" is returned; and if the input string does not contain "End", the original string is returned. When "End" is used with "Start" and the input string does not contain "End", the string following "Start" is returned.
         .EXAMPLE
         $subStringsList = Get-OZODelimiterSubString -String "2023-06-20T14:18:09-05:00{226da830-da5c-42af-83fd-37467b753ec6}" -Start "{" -End "}"
         $subStringsList[0]
-        226da830-da5c-42af-83fd-37467b753ec6
-        .EXAMPLE
-        (Get-OZODelimiterSubString -String "2023-06-20T14:18:09-05:00{226da830-da5c-42af-83fd-37467b753ec6}" -Start "{" -End "}")[0]
         226da830-da5c-42af-83fd-37467b753ec6
         .EXAMPLE
         Get-OZODelimiterSubString -String "2023-06-20T14:18:09-05:00{226da830-da5c-42af-83fd-37467b753ec6}" -Start "{" -End "}" | Select-Object -First 1
@@ -26,6 +23,9 @@ Function Get-OZODelimiterSubString {
         18
         $subStringsList[1]
         09-05
+        .EXAMPLE
+        (Get-OZODelimiterSubString -String "alievertz@onezeroone.dev" -Start "@" -End ".dev")[0]
+        onezeroone
         .OUTPUTS
         System.Collections.Generic.List[String]
         .NOTES
@@ -34,30 +34,61 @@ Function Get-OZODelimiterSubString {
         https://github.com/onezeroone-dev/OZO-PowerShell-Module/blob/main/Documentation/Get-OZODelimiterSubstring.md
     #>
     # Parameters
-    [CmdLetBinding()]
-    param (
-        [Parameter(Mandatory=$true,HelpMessage="The string to parse")][String]$String,
-        [Parameter(Mandatory=$true,HelpMessage="The starting delimiter")][Char]$Start,
-        [Parameter(Mandatory=$true,HelpMessage="The ending delimiter")][Char]$End
+    [CmdLetBinding()] Param (
+        [Parameter(Mandatory=$true,HelpMessage="The string to parse",ValueFromPipeline=$true)][String]$String,
+        [Parameter(Mandatory=$false,HelpMessage="The starting delimiter string")][Char]$Start,
+        [Parameter(Mandatory=$false,HelpMessage="The ending delimiter string")][Char]$End
     )
     # Variables
     [System.Collections.Generic.List[String]]$Results = @()
-    # Determine if the string contains the Start and End characters
-    If ($String -Like ("*" + $Start + "*") -And $String -Like ("*" + $End + "*")) {
-        # String contains Start and End characters; add each of the results to the List
-        ForEach ($Result in [Regex]::Matches($String,"(?<=\$Start).+?(?=\$End)").Value) { $Results.Add($Result) }
-    # ElseIf determine if String contains the Start character
-    } ElseIf ($String -Like ("*" + $Start + "*")) {
-        # String contains the Start character; add the resulting string to the List
-        $Results.Add([Regex]::Matches($String,"(?<=\$Start).*").Value)
-    # ElseIf determine if String contains the End character
-    } ElseIf ($String -Like ("*" + $End + "*")) {
-        # String contains the End character; add the resulting string to the List
-        $Results.Add([Regex]::Matches($String,".*(?=\$End)").Value)
-    # Else add the original string to the List
+    # Determine if we have Start and not have End
+    If ([String]::IsNullOrEmpty($Start) -eq $false -And [String]::IsNullOrEmpty($End) -eq $true) {
+        # We have Start and not have End; determine if String contains Start
+        If ($String -Like ("*" + $Start + "*")) {
+            # String contains Start; return the substring following Start
+            $Results.Add($String.Substring($String.IndexOf($Start) + 1))
+        } Else {
+            # String does not contain Start; return the original unaltered string
+            $Results.Add($String)
+        }
+    # Determine if we not have Start and have End
+    } ElseIf ([String]::IsNullOrEmpty($Start) -eq $true -And [String]::IsNullOrEmpty($End) -eq $false) {
+        # We have End and not have Start; determine if String contains End
+        If ($String -Like ("*" + $End + "*")) {
+            # String contains End; return the substring leading up to End
+            $Results.Add($String.Split($EndFern)[0])
+        } Else {
+            # String does not contain End; return the original unaltered string
+            $Results.Add($String)
+        }
+    # We have Start and End
     } Else {
-        $Results.Add($String)
-    }
+        # Determine if Start and End are identical, and appears at least twice in the input string
+        If ($Start -eq $End -And $String.Split($Start).Count -ge 3) {
+            # Start and End are identical and appears at least twice in the string; perform a simple split and return the middle set
+            [System.Collections.Generic.List[String]] $tempResults = $String.Split($Start)
+            For ($Count = 1; $Count -lt ($tempResults.Count - 1)) {
+                $Results.Add($tempResults[$Count])
+            }
+            #ForEach ($Result in $String.Split($StartFern)[1..-2]) { $Results.Add($Result) }
+        # Determine if the string contains Start and End
+        } ElseIf ($String -Like ("*" + $Start + "*") -And $String -Like ("*" + $End + "*")) {
+            # String contains Start and End; add each of the results to the List
+            ForEach ($Result in [Regex]::Matches($String,"(?<=\$Start).+?(?=\$End)").Value) { $Results.Add($Result) }
+        # Determine if String contains only Start
+        } ElseIf ($String -Like ("*" + $Start + "*")) {
+            # String contains only Start; add the string following the first instance of Start to the list
+            $Results.Add([Regex]::Matches($String,"(?<=\$Start).*").Value)
+        # Determine if String contains only End
+        } ElseIf ($String -Like ("*" + $End + "*")) {
+            # String contains only End; add the string leading up to End to the list
+            $Results.Add([Regex]::Matches($String,".*(?=\$End)").Value)
+        # None of the above apply
+        } Else {
+            # Neither Start or End appear in String; return the original unaltered string
+            $Results.Add($String)
+        }
+    }    
     # Return
     $PSCmdlet.WriteObject($Results)
 }
