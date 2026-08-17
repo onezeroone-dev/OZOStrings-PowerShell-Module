@@ -1,3 +1,34 @@
+Function Convert-OZOJsonFileToString {
+    
+    <#
+        .SYNOPSIS
+        See description.
+        .DESCRIPTION
+        Converts a JSON file to a string.
+        .PARAMETER FilePath
+        The path to the JSON file to convert.
+        .EXAMPLE
+        Convert-OZOJsonFileToString -FilePath "C:\Temp\MyFile.json"
+        .OUTPUTS
+        System.String
+        .LINK
+    #>
+    
+    # Variables
+    [String] $resultsString = $null
+    # Determine that the file exists
+    If ([Boolean](Test-Path -Path $FilePath -PathType Leaf)) {
+        # File exists; try to convert to a string
+        Try {
+            ("'" + ((Get-Content $FilePath -Raw -ErrorAction Stop | ConvertFrom-Json -ErrorAction Stop) | ConvertTo-Json -Compress -ErrorAction Stop).Replace("'",'"') + "'")
+            # Success
+            return $resultsString
+        } Catch {
+            # Failure
+            Throw $_
+        }
+    }
+}
 Function Get-OZODelimiterSubString {
     <#
         .SYNOPSIS
@@ -247,4 +278,10 @@ Function Get-OZOStartSubString {
     }
 }
 
-Export-ModuleMember -Function Get-OZODelimiterSubString,Get-OZOEndSubString,Get-OZOIndexSubString,Get-OZOReverseString,Get-OZOStartSubString
+Export-ModuleMember -Function `
+    Convert-OZOJsonFileToString,
+    Get-OZODelimiterSubString,
+    Get-OZOEndSubString,
+    Get-OZOIndexSubString,
+    Get-OZOReverseString,
+    Get-OZOStartSubString
