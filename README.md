@@ -15,6 +15,8 @@ Import-Module OZOStrings
 ```
 
 ## Functions
+- [Convert-OZOJsonFileToString](Documentation/Convert-OZOJsonFileToString.md)
+- [Convert-OZOJsonStringToFile](Documentation/Convert-OZOJsonStringToFile.md)
 - [Get-OZODelimiterSubString](Documentation/Get-OZODelimiterSubstring.md)
 - [Get-OZOEndSubString](Documentation/Get-OZOEndSubString.md)
 - [Get-OZOIndexSubString](Documentation/Get-OZOIndexSubString.md)

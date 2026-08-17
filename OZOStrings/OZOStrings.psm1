@@ -1,3 +1,58 @@
+Function Convert-OZOJsonFileToString {
+    <#
+        .SYNOPSIS
+        See description.
+        .DESCRIPTION
+        Converts a JSON file to a string.
+        .PARAMETER Path
+        The path to the JSON file to convert.
+        .EXAMPLE
+        Convert-OZOJsonFileToString -Path "C:\Temp\example.json"
+        .LINK
+        https://github.com/onezeroone-dev/OZO-PowerShell-Module/blob/main/Documentation/Convert-OZOJsonFileToString.md
+    #>
+    # Parameters
+    [CmdLetBinding()] Param (
+        [Parameter(Mandatory=$true,HelpMessage="The path to the JSON file to convert")][ValidateScript({Test-Path -Path $_})][String]$Path
+    )
+    # Try to convert to a string
+    Try {
+        return (Get-Content $Path -Raw -ErrorAction Stop | ConvertFrom-Json -ErrorAction Stop) | ConvertTo-Json -Compress -ErrorAction Stop
+        # Success
+    } Catch {
+        # Failure
+        Throw $_
+    }
+}
+
+Function Convert-OZOJsonStringToFile {
+    <#
+        .SYNOPSIS
+        See description.
+        .DESCRIPTION
+        Converts a JSON string to a file.
+        .PARAMETER JsonString
+        The JSON string to convert.
+        .PARAMETER Path
+        The path for the output JSON file.
+        .EXAMPLE
+        Convert-OZOJsonStringtoFile -Path "C:\Temp\example.json" -JsonString '[{"Name":"Tom","EmployeeID":10},{"Name":"Jerry","EmployeeID":20}]'
+        .LINK
+        https://github.com/onezeroone-dev/OZO-PowerShell-Module/blob/main/Documentation/Convert-OZOJsonStringToFile.md
+    #>
+    # Parameters
+    [CmdLetBinding()] Param (
+        [Parameter(Mandatory=$true,HelpMessage="The path to the JSON file to convert")][ValidateScript({Test-Path -Path $_})][String]$Path,
+        [Parameter(Mandatory=$true,HelpMessage="The JSON string to convert")][String]$JsonString
+    )
+    # Try to export the JSON
+    Try {
+        ($JsonString | ConvertFrom-Json -ErrorAction Stop) | ConvertTo-Json -ErrorAction Stop | Set-Content -Path $Path -ErrorAction Stop
+    } Catch {
+        Throw $_
+    }
+}
+
 Function Get-OZODelimiterSubString {
     <#
         .SYNOPSIS
@@ -247,4 +302,11 @@ Function Get-OZOStartSubString {
     }
 }
 
-Export-ModuleMember -Function Get-OZODelimiterSubString,Get-OZOEndSubString,Get-OZOIndexSubString,Get-OZOReverseString,Get-OZOStartSubString
+Export-ModuleMember -Function `
+    Convert-OZOJsonFileToString,
+    Convert-OZOJsonStringToFile,
+    Get-OZODelimiterSubString,
+    Get-OZOEndSubString,
+    Get-OZOIndexSubString,
+    Get-OZOReverseString,
+    Get-OZOStartSubString
