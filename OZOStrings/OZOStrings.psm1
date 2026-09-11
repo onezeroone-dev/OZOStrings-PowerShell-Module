@@ -42,7 +42,7 @@ Function Convert-OZOJsonStringToFile {
     #>
     # Parameters
     [CmdLetBinding()] Param (
-        [Parameter(Mandatory=$true,HelpMessage="The path to the JSON file to convert")][ValidateScript({Test-Path -Path $_})][String]$Path,
+        [Parameter(Mandatory=$true,HelpMessage="The path to the JSON file to convert")][ValidateScript({Test-Path -Path (Split-Path -Path $_ -Parent)})][String]$Path,
         [Parameter(Mandatory=$true,HelpMessage="The JSON string to convert")][String]$JsonString
     )
     # Try to export the JSON
