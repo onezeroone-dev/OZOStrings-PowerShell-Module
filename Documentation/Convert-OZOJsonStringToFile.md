@@ -1,4 +1,4 @@
-# Function-Template
+# Convert-OZOJsonStringToFile
 This function is part of the [OZOStrings PowerShell Module](https://github.com/onezeroone-dev/OZOStrings-PowerShell-Module/blob/main/README.md).
 
 ## Description
